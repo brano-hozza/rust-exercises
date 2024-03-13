@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"path": "unsafe_rust"
+		},
+		{
+			"path": "rust_for_web"
+		}
+	],
+	"settings": {
+		"rust-analyzer.linkedProjects": [
+			".\\c00-axum copy\\Cargo.toml"
+		]
+	}
+}

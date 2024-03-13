@@ -1,0 +1,15 @@
+[package]
+name = "c00-axum"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+axum = "0.7.4"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.68"
+tokio = { version = "1.0", features = ["full"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+diesel = { version = "2.1.0", features = ["postgres"] }
+dotenvy = "0.15"
