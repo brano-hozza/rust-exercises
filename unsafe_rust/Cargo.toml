@@ -1,2 +1,0 @@
-[workspace]
-members = [ "c00-unsafe-options","c01-raw-pointers", "c02-c-strings", "c03-ffi"]

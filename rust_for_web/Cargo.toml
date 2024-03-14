@@ -1,2 +1,0 @@
-[workspace]
-members = ["c00-tokio", "c01-axum", "c02-diesel"]
