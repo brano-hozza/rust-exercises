@@ -71,3 +71,53 @@ loop {
         });
     }
 ```
+
+## Storing data
+
+We now need to somehow store the data, we are going to use the `HashMap<String, Vec<u8>>` structure for it.
+But now we have problem with accessing the data through multiple threads. We could use Arc + Mutex to solve that.
+
+```rs
+type Db = Arc<Mutex<HashMap<String, Vec<u8>>>>;
+...
+let db: Db = Arc::new(Mutex::new(HashMap::<String, Vec<u8>>::new()));
+```
+
+Now we can rewrite our process function to match `mini-redis` library types and use their parsing 
+function to process incoming requests:
+
+```rs
+use mini_redis::Command::{self, Get, Set};
+// Connection, provided by `mini-redis`, handles parsing frames from
+// the socket
+let mut connection = Connection::new(socket);
+
+// Use `read_frame` to receive a command from the connection.
+while let Some(frame) = connection.read_frame().await.unwrap() {
+    let response = match Command::from_frame(frame).unwrap() {
+        Set(cmd) => {
+            // The value is stored as `Vec<u8>`
+            println!("set key = {:?}, value = {:?}", cmd.key(), cmd.value());
+            let mut db = db.lock().unwrap();
+            db.insert(cmd.key().to_string(), cmd.value().to_vec());
+            Frame::Simple("OK".to_string())
+        }
+        Get(cmd) => {
+            println!("get key = {:?}", cmd.key());
+            let db = db.lock().unwrap();
+            if let Some(value) = db.get(cmd.key()) {
+                // `Frame::Bulk` expects data to be of type `Bytes`. This
+                // type will be covered later in the tutorial. For now,
+                // `&Vec<u8>` is converted to `Bytes` using `into()`.
+                Frame::Bulk(value.clone().into())
+            } else {
+                Frame::Null
+            }
+        }
+        cmd => panic!("unimplemented {:?}", cmd),
+    };
+
+    // Write the response to the client
+    connection.write_frame(&response).await.unwrap();
+}
+```
