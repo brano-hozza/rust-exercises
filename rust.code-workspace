@@ -9,7 +9,7 @@
 	],
 	"settings": {
 		"rust-analyzer.linkedProjects": [
-			".\\c00-axum copy\\Cargo.toml"
+			"./Cargo.toml"
 		]
 	}
 }
