@@ -3,7 +3,7 @@ use std::{
     thread,
 };
 
-fn test(f: impl FnOnce() -> ()) {
+fn _test(f: impl FnOnce() -> ()) {
     f()
 }
 
