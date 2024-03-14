@@ -26,6 +26,7 @@ PQ_LIB_DIR="$(brew --prefix libpq)/lib"
 
 # On linux
 sudo apt-get install libpq-dev
+# Set PQ_LIB_DIR to lib path
 
 # On windows
 
@@ -35,10 +36,13 @@ sudo apt-get install libpq-dev
 # and set PQ_LIB_DIR to the lib folder in ProgramFiles
 ```
 
-5. Install diesel cli
+5. Install diesel cli and its extension
 
 ```sh
- cargo install diesel_cli --no-default-features --features postgres
+# https://diesel.rs/guides/getting-started.html
+cargo install diesel_cli --no-default-features --features postgres
+# https://github.com/abbychau/diesel_cli_ext
+ cargo install diesel_cli_ext
 ```
 
 6. Setup diesel
@@ -54,7 +58,7 @@ diesel setup
 diesel migration generate create_users
 diesel migration generate create_posts
 ```
-2. Define tables
+2. Define user migrations
 ```sql
 -- up.sql
 CREATE TABLE users (
@@ -64,6 +68,7 @@ CREATE TABLE users (
 -- down.sql
 DROP TABLE users;
 ```
+3. Define posts migrations
 ```sql
 -- up.sql-- Your SQL goes here
 CREATE TABLE posts (
@@ -81,13 +86,59 @@ ALTER TABLE posts
 -- down.sql
 DROP TABLE posts;
 ```
-3. Apply migrations -> this is going to generate `schema.rs`
+4. Apply migrations -> this is going to generate `schema.rs`
 ```sh
 diesel migration run
 ```
 
+## Prepare function to establish connection
+We also need to prepare function to open new connection to DB. Do not forget to load ENV variables first.
+```rs
+pub fn establish_connection() -> PgConnection {
+    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    PgConnection::establish(&database_url)
+        .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
+}
+```
+
 ## Create models
 
+```rs
+use crate::schema::users;
+use diesel::prelude::*;
+use serde::{Deserialize, Serialize};
+
+#[derive(Queryable, Selectable, Serialize, Insertable)]
+#[diesel(table_name = users)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct User {
+    pub id: i32,
+    pub username: String,
+}
+
+#[derive(Insertable, Deserialize)]
+#[diesel(table_name = users)]
+pub struct CreateUser {
+    pub username: String,
+}
+
+```
+We could also use diesel_ext to generate models and even proto-files
+
+## Use models
+For example if we want to query our models we could write:
+```rs
+let users = users::table
+        .load::<User>(conn)
+        .expect("Error loading users");
+```
+Or to create new users:
+```rs
+let new_user = diesel::insert_into(users::table)
+        .values(&payload)
+        .get_result(conn)
+        .unwrap();
+```
 
 
 
