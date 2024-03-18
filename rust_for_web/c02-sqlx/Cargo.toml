@@ -1,0 +1,16 @@
+[package]
+name = "c02-sqlx"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+axum = "0.7.4"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.68"
+tokio = { version = "1.0", features = ["full"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+sqlx = { version = "0.7", features = ["runtime-tokio", "sqlite", "macros"] }
+uuid = "1.7.0"
+dotenv = "0.15.0"

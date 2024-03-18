@@ -22,12 +22,14 @@ pub async fn create_user(
 ) -> (StatusCode, Json<User>) {
     let conn = &mut establish_connection();
 
-    let new_user = diesel::insert_into(users::table)
+    let res = diesel::insert_into(users::table)
         .values(&payload)
-        .get_result(conn)
-        .unwrap();
-
-    // this will be converted into a JSON response
-    // with a status code of `201 Created`
-    (StatusCode::CREATED, Json(new_user))
+        .get_result(conn);
+    match res {
+        Ok(new_user) => (StatusCode::CREATED, Json(new_user)),
+        Err(e) => {
+            eprintln!("Error inserting user: {:?}", e);
+            (StatusCode::INTERNAL_SERVER_ERROR, Json::default())
+        }
+    }
 }

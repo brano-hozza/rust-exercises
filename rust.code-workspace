@@ -7,4 +7,9 @@
 			"path": "rust_for_web"
 		}
 	],
+	"settings": {
+		"cSpell.words": [
+			"dtos"
+		]
+	},
 }
