@@ -34,6 +34,7 @@ layout: default
 # Learning objective
 
 - Web-focused crates
+- Tracing
 - State managment
 - Serverless
   
@@ -45,6 +46,7 @@ layout: default
 
 - State of Art
 - Front-end & WASM
+- Tracing
 - Back-end
 - Database
   - SQL
@@ -213,12 +215,107 @@ address = "127.0.0.1"
 # The port to serve on.
 port = 8000
 ```
+---
+layout: section
+---
+# Tracing
+---
+layout: default
+---
+
+# Tracing
+
+- span
+- event
+- subscriber
+  
+---
+layout: default
+---
+
+# Tracing
+
+- Crate `tracing` 
+- Structured logging
+```rust
+use tracing::{event, span, Level};
+
+// records an event outside of any span context:
+event!(Level::INFO, "something happened");
+
+let span = span!(Level::INFO, "my_span");
+let _guard = span.enter();
+
+// records an event within "my_span".
+event!(Level::INFO, "something happened inside my_span");
+
+span.exit()
+// records an event outside "my_span".
+event!(Level::INFO, "something happened outside my_span");
+```
 
 ---
 layout: default
 ---
 
-# Axum demo: setting up server
+# Tracing subscription
+
+- Crate `tracing-subscriber` 
+
+```rust
+// Standard output
+let stdout_log = tracing_subscriber::fmt::layer().pretty();
+
+// File output
+let debug_file = File::create("debug.log").expect("Unable to create debug.log");
+let debug_log = tracing_subscriber::fmt::layer().with_writer(Arc::new(debug_file));
+
+tracing_subscriber::registry()
+    .with(stdout_log.with_filter(filter::LevelFilter::INFO))
+    .with(debug_log.with_filter(filter::LevelFilter::DEBUG))
+    .init();
+
+```
+---
+layout: default
+---
+
+# Tracing subscription - output
+
+```txt
+  2024-04-06T15:26:50.450537Z  INFO c06_tracing: something happened
+    at src/main.rs:20
+
+  2024-04-06T15:26:50.450799Z  INFO c06_tracing: something happened inside my_span
+    at src/main.rs:27
+    in c06_tracing::my_span
+
+  2024-04-06T15:26:50.450901Z  INFO c06_tracing: something happened outside my_span
+    at src/main.rs:31
+```
+
+---
+layout: section
+---
+# Back-end
+Axum
+
+---
+layout: default
+---
+
+# Axum
+
+- Tokio-based
+- Simple usage
+- Tracing support
+
+---
+layout: default
+---
+
+# Axum
+- Setup
 
 ```rust
 use axum::{
