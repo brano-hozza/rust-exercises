@@ -10,7 +10,6 @@ use model::post::Post;
 
 #[debug_handler]
 pub async fn get_all(State(state): State<RouterState>) -> Result<Json<Vec<Post>>, ApiError> {
-    println!("get_all");
     state
         .post_service
         .get_all()

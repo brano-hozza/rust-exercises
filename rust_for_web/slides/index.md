@@ -293,6 +293,72 @@ layout: default
   2024-04-06T15:26:50.450901Z  INFO c06_tracing: something happened outside my_span
     at src/main.rs:31
 ```
+---
+layout: section
+---
+# Back-end
+Tokio
+
+---
+layout: default
+---
+
+# Tokio
+
+- Async runtime
+- Built for network apps
+- Large ecosystem
+
+
+
+---
+layout: default
+---
+
+# Tokio - Listener
+
+```rust
+use tokio::net::TcpListener;
+
+#[tokio::main]
+async fn main() {
+    let listener = TcpListener::bind("127.0.0.1:6379").await.unwrap();
+
+    loop {
+        let (socket, _) = listener.accept().await.unwrap();
+        // A new task is spawned for each inbound socket. The socket is
+        // moved to the new task and processed there.
+        tokio::spawn(async move {
+            process(socket).await;
+        });
+    }
+}
+```
+
+---
+layout: default
+---
+
+# Tokio - Shared state
+
+- User status database (KV Storage)
+- Key: username
+- Value: status
+- `Arc` + `Mutex` = ❤️
+
+```rust
+use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
+
+type Db = Arc<Mutex<HashMap<String, String>>>;
+
+#[tokio::main]
+async fn main() {
+    let db = Arc::new(Mutex::new(HashMap::new()));
+
+    // ...
+}
+```
 
 ---
 layout: section
@@ -306,72 +372,127 @@ layout: default
 
 # Axum
 
+- [July 30, 2021](https://tokio.rs/blog/2021-07-announcing-axum)
 - Tokio-based
 - Simple usage
-- Tracing support
+- Focused on web-development
 
 ---
 layout: default
 ---
 
 # Axum
-- Setup
 
 ```rust
-use axum::{
-    extract::{Path, State},
-    response::Html,
-    routing::get,
-    Router,
-};
+use axum::prelude::*;
 use std::net::SocketAddr;
 
 #[tokio::main]
 async fn main() {
-    // set up shared, mutable state.
-    let app_state = Arc::new(Mutex::new(Vec::new()));
-    // build our application with a route
-    let app = Router::new()
-        .route("/:name", get(handler))
-        .with_state(app_state);
-    // run it
+    let app = route("/", get(root));
+
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
-    println!("listening on {}", addr);
-    axum::Server::bind(&addr)
+    hyper::Server::bind(&addr)
         .serve(app.into_make_service())
         .await
         .unwrap();
+}
+
+async fn root() -> &'static str {
+    "Hello, World!"
+}
+```
+---
+layout: default
+---
+# Axum - extractors
+
+```rust
+use axum::{prelude::*, extract::Json};
+use serde::Deserialize;
+
+#[derive(Deserialize)]
+struct CreateUser {
+    username: String,
+}
+
+async fn create_user(Json(payload): Json<CreateUser>) {
+    // `payload` is a `CreateUser`
+}
+
+let app = route("/users", post(create_user));
+```
+---
+layout: default
+---
+
+# Axum - response data
+
+- Handlers can return anything that implements IntoResponse and it will automatically be converted into a response
+
+```rust
+// Returning a tuple of `StatusCode` and another `IntoResponse` will
+// change the status code
+async fn not_found() -> (StatusCode, &'static str) {
+    (StatusCode::NOT_FOUND, "not found")
+}
+
+// `Html` gives a content-type of `text/html`
+async fn html() -> Html<&'static str> {
+    Html("<h1>Hello, World!</h1>")
+}
+
+// `Json` gives a content-type of `application/json` and works with any type
+// that implements `serde::Serialize`
+async fn json() -> Json<Value> {
+    Json(json!({ "data": 42 }))
 }
 ```
 
 ---
 layout: default
 ---
-# Axum demo: request hander
+
+# Axum - routing
 
 ```rust
-/// A very long type name warrants a type alias
-type AppState = State<Arc<Mutex<Vec<String>>>>;
+use axum::prelude::*;
 
-async fn handler(
-    Path(name): Path<String>,
-    State(past_names): State<AppState>,
-) -> Html<String> {
-    let mut response = format!("<h1>Hello, {name}!</h1>");
+let app = route("/", get(root))
+    .route("/users", get(list_users).post(create_user))
+    .route("/users/:id", get(show_user).delete(delete_user));
+```
 
-    // Of course, locking here is not very fast
-    let mut past_names = past_names.lock().await;
+---
+layout: default
+---
 
-    if !past_names.is_empty() {
-        response += "<h2>Names we saw earlier:</h2>";
-        past_names
-            .iter()
-            .for_each(|name| response += &format!("<p>{name}</p>"))
-    }
+# Axum - state managment
 
-    past_names.push(name);
+```rust
+// Must be #[async-trait] implementation
+type MyService = Arc<dyn service::MyService + Send + Sync>;
 
-    Html(response)
+pub struct AppState {
+    pub service: MyService,
+}
+// ...
+let state = routes::RouterState {
+    service: Arc::from(MyServiceImpl {}) as _,
+};
+// ... 
+pub async fn get_all(State(state): State<RouterState>) -> Result<Json<Vec<Post>>, ApiError> {
+    state
+        .post_service
+        .get_all()
+        .await
+        .map(Json)
+        .map_err(Into::into)
 }
 ```
+
 ---
+layout: section
+---
+
+# The end
