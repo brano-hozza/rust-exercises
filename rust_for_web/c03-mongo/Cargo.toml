@@ -1,0 +1,44 @@
+[package]
+name = "c03-mongo"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+members = ["crates/*"]
+resolver = "2"
+
+[workspace.dependencies]
+config = { path = "crates/config" }
+model = { path = "crates/model" }
+routes = { path = "crates/routes" }
+service = { path = "crates/service" }
+
+axum = { version = "0.7.5", features = ["macros"] }
+serde = { version = "1.0.159", features = ["derive"] }
+tokio = { version = "1.27.0", features = ["full"] }
+async-trait = "0.1.68"
+figment = { version = "0.10.8", features = ["toml", "env"] }
+mongodb = "2.4.0"
+axum-server = "0.6.0"
+eyre = "0.6.12"
+color-eyre = "0.6.3"
+tracing = "0.1.40"
+tracing-subscriber = "0.3.18"
+axum-extra = "0.9.3"
+futures = "0.3.30"
+thiserror = "1.0.58"
+uuid = { version = "1.8.0", features = ["serde"] }
+
+[dependencies]
+service.workspace = true
+routes.workspace = true
+mongodb.workspace = true
+config.workspace = true
+
+tokio.workspace = true
+axum-server.workspace = true
+eyre.workspace = true
+color-eyre.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+uuid = { workspace = true, features = ["serde"] }

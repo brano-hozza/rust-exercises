@@ -16,6 +16,4 @@ fn main() {
     // Call unsafe function
     //
     // unsafe_fun();
-
-    println!("Hello, world!");
 }
