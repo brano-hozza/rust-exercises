@@ -11,12 +11,12 @@ fn App() -> Html {
         }
     };
 
-    let btnCls = vec!["p-2", "bg-red-100", "rounded", "w-1/2"];
+    let btn_cls = vec!["p-2", "bg-red-100", "rounded", "w-1/2"];
 
     html! {
         <div class="flex w-full h-screen justify-center items-center">
             <div class="w-1/2 flex justify-between">
-                <button class={classes!(btnCls)} {onclick}>{ "+1" }</button>
+                <button class={classes!(btn_cls)} {onclick}>{ "+1" }</button>
                 <p>{ *counter }</p>
             </div>
         </div>
