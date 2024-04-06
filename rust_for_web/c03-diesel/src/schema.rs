@@ -2,10 +2,9 @@
 
 diesel::table! {
     posts (id) {
-        id -> Int4,
-        user_id -> Int4,
-        #[max_length = 255]
-        title -> Varchar,
+        id -> Integer,
+        user_id -> Integer,
+        title -> Text,
         body -> Text,
         published -> Bool,
         created_at -> Timestamp,
@@ -14,9 +13,8 @@ diesel::table! {
 
 diesel::table! {
     users (id) {
-        id -> Int4,
-        #[max_length = 255]
-        username -> Varchar,
+        id -> Integer,
+        username -> Text,
     }
 }
 
