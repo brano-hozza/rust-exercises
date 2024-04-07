@@ -569,6 +569,7 @@ layout: default
 
 # Axum - state managment
 
+- Local or DB
 ```rust
 // Must be #[async-trait] implementation
 type MyService = Arc<dyn service::MyService + Send + Sync>;
@@ -642,12 +643,30 @@ layout: default
 
 # Database - options
 
+- Custom
+- KV Storage
 - SQL 
   - Postgres, MySQL, MariadDB
   - SQLite (Local DB)
 - NoSQL
   - MongoDB, Cassandra
 - Graph - Neo4j
+
+---
+layout: default
+---
+
+# Database - representation
+
+- Raw - Queries
+- ORM - Object relation modeling
+
+---
+layout: section
+---
+
+# Database
+sqlx
 
 ---
 layout: default
@@ -673,6 +692,127 @@ let app_state = AppState {
         .await?,
 };
 ```
+
+---
+layout: default
+---
+
+# sqlx - queries
+
+- powerful macros `query!` and `query_as!`
+
+```rust
+ let result = sqlx::query(
+        "
+        INSERT INTO users (username)
+        VALUES (?)
+        ",
+    )
+    .bind(payload.username.clone())
+    .execute(&app_state.pool)
+    .await;
+```
+
+---
+layout: section
+---
+
+# Database
+diesel ORM
+
+---
+layout: default
+---
+
+# diesel
+
+- ORM
+- migrations
+- schemas
+- powerfull CLI `diesel_cli`
+  
+
+---
+layout: default
+---
+
+# diesel - migration
+
+- Commands to prepare diesel:
+```sh
+diesel setup
+diesel migration generate create_users
+```
+
+- Migration to create user:
+  
+```sql
+-- up.sql
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(255) NOT NULL
+);
+-- down.sql
+DROP TABLE users;
+```
+
+---
+layout: default
+---
+
+# diesel - schema
+
+- Run `diesel migration run` to generate schema
+
+```rust
+// Generated file src/schema.rs
+diesel::table! {
+    users (id) {
+        id -> Integer,
+        username -> Text,
+    }
+}
+```
+
+- Create model
+
+```rust
+use crate::schema::users;
+use diesel::prelude::*;
+use serde::{Deserialize, Serialize};
+
+#[derive(Queryable, Selectable, Serialize, Insertable)]
+#[diesel(table_name = users)]
+#[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+pub struct User {
+    pub id: i32,
+    pub username: String,
+}
+```
+---
+layout: default
+---
+
+# diesel - query
+
+- Get users
+
+```rust
+pub async fn get_users() -> (StatusCode, Json<Vec<User>>) {
+    let conn = &mut establish_connection();
+
+    let users = users::table
+        .load::<User>(conn)
+        .expect("Error loading users");
+
+    // this will be converted into a JSON response
+    // with a status code of `200 OK`
+    (StatusCode::OK, Json(users))
+}
+```
+
+
+
 
 
 ---
