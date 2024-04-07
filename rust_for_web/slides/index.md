@@ -72,17 +72,19 @@ layout: default
 - Styles?
 - Script?
 
-```html
+```html {all|3-8|9-13|6,7,10|11-12}
 <!doctype html>
 <html>
     <head>
         <meta charset="utf-8" />
         <title>Yew App</title>
         <style>p{color: red;}</style>
+        <link rel="stylesheet" src="./style.css" type="text/css">
     </head>
     <body>
-        <p>Hello world</p>
+        <p style="font-family: 'Roboto'">Hello world</p>
         <script>console.log("Hello script")</script>
+        <script src="./my-script.js"> </script>
     </body>
 </html>
 
@@ -320,7 +322,7 @@ layout: default
 
 - Crate `tracing` 
 - Structured logging
-```rust
+```rust {all|6-12|all}
 use tracing::{event, span, Level};
 
 // records an event outside of any span context:
@@ -483,7 +485,7 @@ layout: default
 
 # Axum
 
-```rust
+```rust {all|6|15-17}
 use axum::prelude::*;
 use std::net::SocketAddr;
 
@@ -507,7 +509,7 @@ layout: default
 ---
 # Axum - extractors
 
-```rust
+```rust {all|4-7|9}
 use axum::{prelude::*, extract::Json};
 use serde::Deserialize;
 
@@ -530,7 +532,7 @@ layout: default
 
 - Handlers can return anything that implements IntoResponse and it will automatically be converted into a response
 
-```rust
+```rust {1-5|7-10|14-16}
 // Returning a tuple of `StatusCode` and another `IntoResponse` will
 // change the status code
 async fn not_found() -> (StatusCode, &'static str) {
@@ -555,12 +557,28 @@ layout: default
 
 # Axum - routing
 
+- Routes with params 
+  
 ```rust
 use axum::prelude::*;
 
 let app = route("/", get(root))
     .route("/users", get(list_users).post(create_user))
     .route("/users/:id", get(show_user).delete(delete_user));
+```
+
+- Nesting
+
+```rust
+let user_routes = Router::new().route("/:id", get(|| async {}));
+
+let team_routes = Router::new().route("/", post(|| async {}));
+
+let api_routes = Router::new()
+    .nest("/users", user_routes)
+    .nest("/teams", team_routes);
+
+let app = Router::new().nest("/api", api_routes);
 ```
 
 ---
@@ -570,7 +588,7 @@ layout: default
 # Axum - state managment
 
 - Local or DB
-```rust
+```rust {all|1-6|8-10|12-}
 // Must be #[async-trait] implementation
 type MyService = Arc<dyn service::MyService + Send + Sync>;
 
@@ -607,8 +625,7 @@ layout: default
 - `dotenv` - Same implementation for multiple languages
 - `figment` - Supports multiple config files
 
-```rust
-
+```rust {1-13|14-19|all}
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PostConfig {
     pub collection: String,
@@ -699,7 +716,7 @@ layout: default
 
 # sqlx - queries
 
-- powerful macros `query!` and `query_as!`
+- `query` method
 
 ```rust
  let result = sqlx::query(
@@ -711,6 +728,16 @@ layout: default
     .bind(payload.username.clone())
     .execute(&app_state.pool)
     .await;
+```
+
+- powerful macros `query!` and `query_as!` (static query check)
+  
+```rust
+let users = sqlx::query_as!(User,
+    "SELECT * FROM users WHERE name = ?",
+    name)
+    .fetch_all(&pool) // -> Vec<User>
+    .await?;
 ```
 
 ---
@@ -838,7 +865,7 @@ layout: default
 
 # Simple lambda
 
-```rust
+```rust {all|3-10|12-21}
 use lambda_http::{run, service_fn, Body, Error, Request, RequestExt, Response};
 
 async fn function_handler(event: Request) -> Result<Response<Body>, Error> {
@@ -887,4 +914,10 @@ layout: default
 layout: section
 ---
 
-# The end
+# The end 🎉
+
+---
+layout: section
+---
+
+# Questions
