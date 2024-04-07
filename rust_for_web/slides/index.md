@@ -380,6 +380,23 @@ layout: default
 layout: section
 ---
 # Back-end
+
+---
+layout: default
+---
+
+# Backend
+
+- Service
+- Document storage
+- Processing unit
+- Synchronized & persistent state
+- Accessible through network
+
+---
+layout: section
+---
+# Back-end
 Tokio
 
 ---
@@ -573,6 +590,158 @@ pub async fn get_all(State(state): State<RouterState>) -> Result<Json<Vec<Post>>
         .map_err(Into::into)
 }
 ```
+
+---
+layout: section
+---
+
+# Configuration
+
+---
+layout: default
+---
+
+# Configuration
+
+- `dotenv` - Same implementation for multiple languages
+- `figment` - Supports multiple config files
+
+```rust
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PostConfig {
+    pub collection: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Config {
+    pub mongo: String,
+    pub listen: SocketAddr,
+    pub database: String,
+    pub post: PostConfig,
+}
+
+pub fn config() -> Result<Config, figment::Error> {
+    Figment::new()
+        .merge(Toml::file("config.toml"))
+        .merge(Env::prefixed("MYAPP_"))
+        .extract()
+}
+```
+
+
+---
+layout: section
+---
+
+# Database
+
+---
+layout: default
+---
+
+# Database - options
+
+- SQL 
+  - Postgres, MySQL, MariadDB
+  - SQLite (Local DB)
+- NoSQL
+  - MongoDB, Cassandra
+- Graph - Neo4j
+
+---
+layout: default
+---
+
+# sqlx
+
+- Select DB with feature flags
+- Support for PostgreSQL, MySQL, MariaDB and SQLite.
+
+```rust
+dotenv::dotenv().ok();
+tracing_subscriber::fmt::init();
+
+let app_state = AppState {
+    pool: SqlitePoolOptions::new()
+        .max_connections(5)
+        .connect(
+            env::var("DATABASE_URL")
+                .unwrap_or("sqlite::memory:".to_string())
+                .as_str(),
+        )
+        .await?,
+};
+```
+
+
+---
+layout: section
+---
+
+# Serverless
+
+---
+layout: default
+---
+
+# AWS Lambda
+
+- Code on the edge
+- CLI
+- `lambda` & `lambda_http` [crate](https://www.cargo-lambda.info/guide/what-is-cargo-lambda.html) for rust
+- Cold boot == $$$
+
+---
+layout: default
+---
+
+# Simple lambda
+
+```rust
+use lambda_http::{run, service_fn, Body, Error, Request, RequestExt, Response};
+
+async fn function_handler(event: Request) -> Result<Response<Body>, Error> {
+    let resp = Response::builder()
+        .status(200)
+        .header("content-type", "text/html")
+        .body("Hello AWS Lambda HTTP request".into())
+        .map_err(Box::new)?;
+    Ok(resp)
+}
+
+#[tokio::main]
+async fn main() -> Result<(), Error> {
+    tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::INFO)
+        .with_target(false)
+        .without_time()
+        .init();
+
+    run(service_fn(function_handler)).await
+}
+```
+
+---
+layout: default
+---
+
+# Lambda deploy
+
+- Setup AWS CLI
+- Build lambda `cargo lambda build --release`
+- Deploy `cargo lambda deploy`
+
+
+---
+layout: default
+---
+
+# Cold boot
+
+- [Experiment by Ervin Szilágyi](https://ervinszilagyi.dev/articles/running-serverless-lambdas-with-rust-aws.html)  
+
+<img src="/images/cold_start.png" class="mx-25 w-170 rounded shadow" />
 
 ---
 layout: section
