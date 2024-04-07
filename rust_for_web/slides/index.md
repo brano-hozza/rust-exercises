@@ -75,16 +75,15 @@ layout: default
 ```html
 <!doctype html>
 <html>
-
-<head>
-    <meta charset="utf-8" />
-    <title>Yew App</title>
-    <style>p{color: red;}</style>
-</head>
-<body>
-    <p>Hello world</p>
-    <script>console.log("Hello script")</script>
-</body>
+    <head>
+        <meta charset="utf-8" />
+        <title>Yew App</title>
+        <style>p{color: red;}</style>
+    </head>
+    <body>
+        <p>Hello world</p>
+        <script>console.log("Hello script")</script>
+    </body>
 </html>
 
 ```
@@ -140,6 +139,33 @@ layout: section
 
 # Front-end & WASM
 
+
+---
+layout: default
+---
+
+# WASM
+
+- Assembly-like language
+- Blazzingly fast
+
+```txt
+(module
+  (func $add (param $lhs i32) (param $rhs i32) (result i32)
+    local.get $lhs
+    local.get $rhs
+    i32.add)
+  (export "add" (func $add))
+)
+```
+
+- Use in browser/server
+
+```js
+WebAssembly.instantiateStreaming(fetch("add.wasm")).then((obj) => {
+  console.log(obj.instance.exports.add(1, 2)); // "3"
+});
+```
 
 ---
 layout: default
