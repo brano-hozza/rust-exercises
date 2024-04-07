@@ -33,6 +33,7 @@ layout: default
 
 # Learning objective
 
+- What is web development
 - Web-focused crates
 - Tracing
 - State managment
@@ -44,6 +45,7 @@ layout: default
 
 # Contents
 
+- Web development
 - State of Art
 - Front-end & WASM
 - Tracing
@@ -53,6 +55,61 @@ layout: default
   - NoSQL
 - Serverless
 - Best-practices
+
+---
+layout: section
+---
+
+# What is web development?
+
+---
+layout: default
+---
+
+# Webpage components
+
+- Structure
+- Styles?
+- Script?
+
+```html
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Yew App</title>
+    <style>p{color: red;}</style>
+</head>
+<body>
+    <p>Hello world</p>
+    <script>console.log("Hello script")</script>
+</body>
+</html>
+
+```
+
+---
+layout: default
+---
+
+# Architecture - buzzwords
+
+- static / dynamic
+- SSR / SPA / SSG (Generation / Hydration)
+- REST / SOAP 💀
+- serverless (AWS / Azure / Google / ...)
+
+
+---
+layout: default
+---
+
+# Architecture - SSR vs SPA
+
+<img src="/images/SPA_SSR.png" class="self-center mt-10 p-10 rounded shadow bg-white" />
+
+[Source](https://www.velv.pt/updates/server-side-rendering)
 
 ---
 layout: section
