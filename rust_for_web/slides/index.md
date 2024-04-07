@@ -3,16 +3,16 @@ theme: teach-rs
 class: text-center
 highlighter: shiki
 lineNumbers: true
-info: "Rust - 5.1: Rust for Web"
+info: "Rust for Web"
 drawings:
     persist: false
 fonts:
     mono: Fira Mono
 layout: cover
-title: "Rust - 5.1: Rust for Web"
+title: "Rust for Web"
 ---
 
-# Rust programming
+# Rust
 
 
 ## Rust for web
