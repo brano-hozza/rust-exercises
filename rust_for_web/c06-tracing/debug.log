@@ -1,4 +1,4 @@
-[2m2024-04-06T15:26:50.450599Z[0m [32m INFO[0m [2mc06_tracing[0m[2m:[0m something happened
-[2m2024-04-06T15:26:50.450666Z[0m [34mDEBUG[0m [2mc06_tracing[0m[2m:[0m only for debug
-[2m2024-04-06T15:26:50.450820Z[0m [32m INFO[0m [1mmy_span[0m[2m:[0m [2mc06_tracing[0m[2m:[0m something happened inside my_span
-[2m2024-04-06T15:26:50.450914Z[0m [32m INFO[0m [2mc06_tracing[0m[2m:[0m something happened outside my_span
+[2m2024-04-10T12:22:29.995716Z[0m [32m INFO[0m [2mc06_tracing[0m[2m:[0m something happened
+[2m2024-04-10T12:22:29.995762Z[0m [34mDEBUG[0m [2mc06_tracing[0m[2m:[0m only for debug
+[2m2024-04-10T12:22:29.995900Z[0m [32m INFO[0m [1mmy_span[0m[2m:[0m [2mc06_tracing[0m[2m:[0m something happened inside my_span
+[2m2024-04-10T12:22:29.995988Z[0m [32m INFO[0m [2mc06_tracing[0m[2m:[0m something happened outside my_span

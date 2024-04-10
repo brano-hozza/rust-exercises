@@ -10,13 +10,13 @@ pub async fn create_user(
 ) -> (StatusCode, Json<User>) {
     // insert your application logic here
 
-    let result = sqlx::query(
+    let result = sqlx::query!(
         "
         INSERT INTO users (username)
         VALUES (?)
         ",
+        payload.username
     )
-    .bind(payload.username.clone())
     .execute(&app_state.pool)
     .await;
 

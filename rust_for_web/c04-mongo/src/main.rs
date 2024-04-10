@@ -3,6 +3,7 @@ use std::sync::Arc;
 use config::Config;
 use mongodb::Client;
 use service::post::PostServiceImpl;
+use tracing::event;
 
 #[tokio::main]
 async fn main() -> eyre::Result<()> {
@@ -20,6 +21,8 @@ async fn run(config: Config) -> eyre::Result<()> {
             collection: database.collection(&config.post.collection),
         }) as _,
     };
+
+    event!(tracing::Level::INFO, "Listening on {}", config.listen);
 
     let app = routes::router(state);
     axum_server::bind(config.listen)

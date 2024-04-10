@@ -1,0 +1,3 @@
+mongo = "mongodb://root:password@localhost:27017"
+listen = "127.0.0.1:3000"
+database = "gardener"

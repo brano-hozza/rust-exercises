@@ -54,7 +54,6 @@ layout: default
   - SQL
   - NoSQL
 - Serverless
-- Best-practices
 
 ---
 layout: section
